@@ -17,3 +17,5 @@ This is a program that can be used to help you find 5 letter words for wordle
 - The next text box is for letters that you know are in the word, but you don't know where in the word they are (yellow letters). The program will only generate words that contain these letters.
 - Once you are done entering the info, click the "Find Words" button, and the big text box on the right will contain the possible words.
 - After clicking the "Find Words" button, you can make changes to the input, and a new list of words will be generated based on the new input
+
+![A screenshot of the program](https://github.com/Jeremald/WordleHelper/blob/master/WordleHelper_Screenshot.png "Screenshot")
