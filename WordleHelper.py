@@ -225,10 +225,20 @@ def missing_4(word, results):
 
 
 def missing_5(results):
-    results['state'] = 'normal'
-    results.insert('1.0', 'Please enter at')
-    results.insert('2.0', 'least one letter')
-    results['state'] = 'disabled'
+    if len(remaining_letters) == 26 and len(required_letters) == 0:
+        results['state'] = 'normal'
+        results.insert('1.0', 'Please enter\nsome info')
+        results['state'] = 'disabled'
+    else:
+        # for all possible letter combinations
+        for let_1 in remaining_letters:
+            for let_2 in remaining_letters:
+                for let_3 in remaining_letters:
+                    for let_4 in remaining_letters:
+                        for let_5 in remaining_letters:
+                            new_word = let_1 + let_2 + let_3 + let_4 + let_5
+                            check_and_add(new_word, results)
+
 
 
 def check_and_add(word, results):
