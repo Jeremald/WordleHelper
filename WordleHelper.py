@@ -39,27 +39,39 @@ def main():
 
     l1_text = tk.StringVar()
     l1_box = ttk.Entry(word_frame, width=1, textvariable=l1_text)
-    l1_text.trace('w', lambda *args: character_limit(l1_text))
+    l1_box.bind('<Right>', lambda *args: go_next(l2_box))
+    l1_text.trace('w', lambda *args: character_limit(l1_text, l2_box))
     l1_box.grid(column=0, row=0)
 
     l2_text = tk.StringVar()
     l2_box = ttk.Entry(word_frame, width=1, textvariable=l2_text)
-    l2_text.trace('w', lambda *args: character_limit(l2_text))
+    l2_box.bind('<BackSpace>', lambda *args: go_back(l1_box))
+    l2_box.bind('<Left>', lambda *args: go_back(l1_box))
+    l2_box.bind('<Right>', lambda *args: go_next(l3_box))
+    l2_text.trace('w', lambda *args: character_limit(l2_text, l3_box))
     l2_box.grid(column=1, row=0)
 
     l3_text = tk.StringVar()
     l3_box = ttk.Entry(word_frame, width=1, textvariable=l3_text)
-    l3_text.trace('w', lambda *args: character_limit(l3_text))
+    l3_box.bind('<BackSpace>', lambda *args: go_back(l2_box))
+    l3_box.bind('<Left>', lambda *args: go_back(l2_box))
+    l3_box.bind('<Right>', lambda *args: go_next(l4_box))
+    l3_text.trace('w', lambda *args: character_limit(l3_text, l4_box))
     l3_box.grid(column=2, row=0)
 
     l4_text = tk.StringVar()
     l4_box = ttk.Entry(word_frame, width=1, textvariable=l4_text)
-    l4_text.trace('w', lambda *args: character_limit(l4_text))
+    l4_box.bind('<BackSpace>', lambda *args: go_back(l3_box))
+    l4_box.bind('<Left>', lambda *args: go_back(l3_box))
+    l4_box.bind('<Right>', lambda *args: go_next(l5_box))
+    l4_text.trace('w', lambda *args: character_limit(l4_text, l5_box))
     l4_box.grid(column=3, row=0)
 
     l5_text = tk.StringVar()
     l5_box = ttk.Entry(word_frame, width=1, textvariable=l5_text)
-    l5_text.trace('w', lambda *args: character_limit(l5_text))
+    l5_box.bind('<BackSpace>', lambda *args: go_back(l4_box))
+    l5_box.bind('<Left>', lambda *args: go_back(l4_box))
+    l5_text.trace('w', lambda *args: character_limit(l5_text, None))
     l5_box.grid(column=4, row=0)
 
     word_frame.grid(row=0, column=0, pady=10)
@@ -240,7 +252,6 @@ def missing_5(results):
                             check_and_add(new_word, results)
 
 
-
 def check_and_add(word, results):
     global word_count
     valid = True
@@ -273,13 +284,16 @@ def make_word(l1, l2, l3, l4, l5):
     return l1 + l2 + l3 + l4 + l5
 
 
-def character_limit(text):
+def character_limit(text, next_box):
     # only let user type letters
     if not text.get().isalpha():
         text.set('')
     # if user entered more than 1 letter, remove extra letters
     elif len(text.get()) > 0:
         text.set(text.get()[0].upper())
+    # Move to next letter after typing something
+    if next_box and text.get() != '':
+        next_box.focus()
 
 
 def make_upper(text):
@@ -288,6 +302,16 @@ def make_upper(text):
         text.set(text.get()[:-1].upper())
     else:
         text.set(text.get().upper())
+
+
+def go_back(prev):
+    if prev:
+        prev.focus()
+
+
+def go_next(next_box):
+    if next_box:
+        next_box.focus()
 
 
 if __name__ == '__main__':
