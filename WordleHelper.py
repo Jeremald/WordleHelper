@@ -38,13 +38,13 @@ def main():
     word_frame = ttk.Frame(window)
 
     l1_text = tk.StringVar()
-    l1_box = ttk.Entry(word_frame, width=1, textvariable=l1_text)
+    l1_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l1_text)
     l1_box.bind('<Right>', lambda *args: go_next(l2_box))
     l1_text.trace('w', lambda *args: character_limit(l1_text, l2_box))
     l1_box.grid(column=0, row=0)
 
     l2_text = tk.StringVar()
-    l2_box = ttk.Entry(word_frame, width=1, textvariable=l2_text)
+    l2_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l2_text)
     l2_box.bind('<BackSpace>', lambda *args: go_back(l1_box))
     l2_box.bind('<Left>', lambda *args: go_back(l1_box))
     l2_box.bind('<Right>', lambda *args: go_next(l3_box))
@@ -52,7 +52,7 @@ def main():
     l2_box.grid(column=1, row=0)
 
     l3_text = tk.StringVar()
-    l3_box = ttk.Entry(word_frame, width=1, textvariable=l3_text)
+    l3_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l3_text)
     l3_box.bind('<BackSpace>', lambda *args: go_back(l2_box))
     l3_box.bind('<Left>', lambda *args: go_back(l2_box))
     l3_box.bind('<Right>', lambda *args: go_next(l4_box))
@@ -60,7 +60,7 @@ def main():
     l3_box.grid(column=2, row=0)
 
     l4_text = tk.StringVar()
-    l4_box = ttk.Entry(word_frame, width=1, textvariable=l4_text)
+    l4_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l4_text)
     l4_box.bind('<BackSpace>', lambda *args: go_back(l3_box))
     l4_box.bind('<Left>', lambda *args: go_back(l3_box))
     l4_box.bind('<Right>', lambda *args: go_next(l5_box))
@@ -68,7 +68,7 @@ def main():
     l4_box.grid(column=3, row=0)
 
     l5_text = tk.StringVar()
-    l5_box = ttk.Entry(word_frame, width=1, textvariable=l5_text)
+    l5_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l5_text)
     l5_box.bind('<BackSpace>', lambda *args: go_back(l4_box))
     l5_box.bind('<Left>', lambda *args: go_back(l4_box))
     l5_text.trace('w', lambda *args: character_limit(l5_text, None))
@@ -290,10 +290,11 @@ def character_limit(text, next_box):
         text.set('')
     # if user entered more than 1 letter, remove extra letters
     elif len(text.get()) > 0:
-        text.set(text.get()[0].upper())
+        text.set(text.get()[-1].upper())
     # Move to next letter after typing something
     if next_box and text.get() != '':
         next_box.focus()
+        next_box.icursor(1)
 
 
 def make_upper(text):
@@ -312,6 +313,7 @@ def go_back(prev):
 def go_next(next_box):
     if next_box:
         next_box.focus()
+        next_box.icursor(1)
 
 
 if __name__ == '__main__':
