@@ -4,6 +4,8 @@ from tkinter.scrolledtext import ScrolledText
 import enchant
 
 my_dict = enchant.Dict('en_US')
+added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
+               'briar', 'iliac', 'caddy', 'masse', 'donut', 'plier', 'snuck', 'octad', 'utile', 'ombre']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
@@ -11,6 +13,10 @@ word_count = 1
 
 
 def main():
+    # add missing words to dictionary
+    for word in added_words:
+        my_dict.add(word)
+
     window = tk.Tk()
 
     window.title('Wordle Helper')
@@ -285,14 +291,21 @@ def make_word(l1, l2, l3, l4, l5):
 
 
 def character_limit(text, next_box):
-    # only let user type letters
-    if not text.get().isalpha():
-        text.set('')
+    cleared = False
+
     # if user entered more than 1 letter, remove extra letters
-    elif len(text.get()) > 0:
-        text.set(text.get()[-1].upper())
-    # Move to next letter after typing something
-    if next_box and text.get() != '':
+    if len(text.get()) > 0:
+        char = text.get()[-1].upper()
+        if char.isalpha():
+            text.set(char)
+        # clear the text box if space is pressed
+        elif char == ' ':
+            text.set('')
+            cleared = True
+        else:
+            text.set(text.get()[0])
+    # Move to next letter after typing something or after pressing space
+    if next_box and (text.get() != '' or cleared):
         next_box.focus()
         next_box.icursor(1)
 
