@@ -302,8 +302,10 @@ def character_limit(text, next_box):
         elif char == ' ':
             text.set('')
             cleared = True
-        else:
+        elif text.get()[0].isalpha():
             text.set(text.get()[0])
+        else:
+            text.set('')
     # Move to next letter after typing something or after pressing space
     if next_box and (text.get() != '' or cleared):
         next_box.focus()
