@@ -23,8 +23,8 @@ def main():
 
     window.title('Wordle Helper')
 
-    window_width = 400
-    window_height = 190
+    window_width = 700
+    window_height = 420
 
     # get screen dimensions
     screen_width = window.winfo_screenwidth()
