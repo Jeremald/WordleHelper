@@ -7,7 +7,7 @@ my_dict = enchant.Dict('en_US')
 added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
                'briar', 'iliac', 'caddy', 'masse', 'donut', 'plier', 'snuck', 'octad', 'utile', 'ombre', 'flyer',
                'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
-               'caput', 'petri']
+               'caput', 'petri', 'chica', 'droit', 'recut', 'carte']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
@@ -164,6 +164,12 @@ def find_words(l1, l2, l3, l4, l5, remove, required, results):
         missing_4(word, results)
     elif num_missing == 5:
         missing_5(results)
+
+    # if no words were found
+    if word_count == 1:
+        results['state'] = 'normal'
+        results.insert('1.0', 'No words found')
+        results['state'] = 'disabled'
 
 
 def missing_1(word, results):
