@@ -8,7 +8,8 @@ added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'g
                'briar', 'iliac', 'caddy', 'masse', 'donut', 'plier', 'snuck', 'octad', 'utile', 'ombre', 'flyer',
                'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
                'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
-               'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy']
+               'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
+               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
