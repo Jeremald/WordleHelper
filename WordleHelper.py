@@ -9,7 +9,7 @@ added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'g
                'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
                'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
                'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
-               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook']
+               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
@@ -22,11 +22,12 @@ def main():
         my_dict.add(word)
 
     window = tk.Tk()
+    window.tk.call('tk', 'scaling', 2.6)
 
     window.title('Wordle Helper')
 
-    window_width = 400
-    window_height = 230
+    window_width = 700
+    window_height = 420
 
     # get screen dimensions
     screen_width = window.winfo_screenwidth()
