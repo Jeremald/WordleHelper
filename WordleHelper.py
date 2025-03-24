@@ -9,7 +9,8 @@ added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'g
                'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
                'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
                'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
-               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy']
+               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy',
+               'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
@@ -324,11 +325,15 @@ def character_limit(text, next_box):
 
 
 def make_upper(text):
-    # if user entered non-alpha character, remove it
-    if len(text.get()) > 0 and not text.get()[-1].isalpha():
-        text.set(text.get()[:-1].upper())
-    else:
-        text.set(text.get().upper())
+    letters = text.get().upper()
+    
+    # if user entered non-alpha character, or a repeat letter remove it
+    if len(letters) > 0:
+        lastLetter = letters[-1]
+        if not lastLetter.isalpha() or lastLetter in letters[:-1]:
+            text.set(letters[:-1])
+        else:
+            text.set(letters)
 
 
 def go_back(prev):
