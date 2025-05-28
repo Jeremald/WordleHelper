@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
+from tkinter.messagebox import showwarning
 import enchant
+import argparse
 
 my_dict = enchant.Dict('en_US')
 added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
@@ -10,7 +12,8 @@ added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'g
                'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
                'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
                'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy',
-               'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima', 'ortho', 'odour', 'apnea']
+               'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima', 'ortho', 'odour', 'apnea',
+               'melty', 'biome', 'niner']
 remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters = []
@@ -18,12 +21,23 @@ word_count = 1
 
 
 def main():
+    # add argument for setting the scale factor
+    parser = argparse.ArgumentParser(description='Tool to help solve Wordle puzzles')
+    parser.add_argument('-s', '--scale', default=100, type=int, required=False, help='Set the desired scaling percentage')
+    args = parser.parse_args()
+
     # add missing words to dictionary
     for word in added_words:
         my_dict.add(word)
 
     window = tk.Tk()
-    window.tk.call('tk', 'scaling', 2.6)
+
+    # set scaling if needed
+    scale = args.scale
+    if scale == 150:
+        window.tk.call('tk', 'scaling', 2.6)
+    elif scale != 100:
+        showwarning(title='Unsupported Scale', message=f'A scale of {scale}% is not currently supported, using 100 instead')
 
     window.title('Wordle Helper')
 
@@ -326,7 +340,7 @@ def character_limit(text, next_box):
 
 def make_upper(text):
     letters = text.get().upper()
-    
+
     # if user entered non-alpha character, or a repeat letter remove it
     if len(letters) > 0:
         lastLetter = letters[-1]
