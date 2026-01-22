@@ -3,19 +3,14 @@ This is a program that can be used to help you find 5 letter words for wordle
 
 ## How to set up:
 1. Make sure you have a version of python 3 installed
-2. Make sure you have the Tkinter library (this should be installed by default, but it may not be)
-- On MacOS: You may need to run the following command (if you have homebrew installed): brew install python-tk@3.9
-- On Linux: You may need to install it from your package manager (either python3-tk or python3-tkinter)
-3. You will need to install the enchant library (See this link for details: https://pyenchant.github.io/pyenchant/install.html)
+2. Install Qt for Python using the following command:  
+`pip3 install pyside6`
+3. Install pyqtdarktheme-fork using the following command:  
+`pip3 install pyqtdarktheme-fork`
+4. You will need to install the enchant library (See this link for details: https://pyenchant.github.io/pyenchant/install.html)
 
 ## How to run:
 `python3 <path to WordleHelper.py>`
-
-You can also set a scale percentage using -s or --scale
-
-Ex: `python3 WordleHelper.py -s 150`
-
-(Currently 150 is the only supported value. Everything else will just use no scaling)
 
 ## How to use:
 - The five boxes at the top represent the five letters in the word. Fill in the letters that you know are correct.

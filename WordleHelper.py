@@ -1,230 +1,176 @@
-import tkinter as tk
-from tkinter import ttk
-from tkinter.scrolledtext import ScrolledText
-from tkinter.messagebox import showwarning
+from typing import override
 import enchant
-import argparse
+from PySide6 import QtCore, QtWidgets, QtGui
+import sys
+import qdarktheme
 
 my_dict = enchant.Dict('en_US')
-added_words = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
-               'briar', 'iliac', 'caddy', 'masse', 'donut', 'plier', 'snuck', 'octad', 'utile', 'ombre', 'flyer',
-               'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
-               'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
-               'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
-               'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy',
-               'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima', 'ortho', 'odour', 'apnea',
-               'melty', 'biome', 'niner', 'haram', 'whirr', 'sicky', 'stoma', 'unarm', 'bento', 'kefir', 'ichor']
-remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-                     'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-required_letters = []
+added_words: list[str]  = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
+                           'briar', 'iliac', 'caddy', 'masse', 'donut', 'plier', 'snuck', 'octad', 'utile', 'ombre', 'flyer',
+                           'loupe', 'rebar', 'ramen', 'ovine', 'sheik', 'crump', 'doula', 'chuff', 'folky', 'primo', 'eying',
+                           'caput', 'petri', 'chica', 'droit', 'recut', 'carte', 'vaper', 'ungag', 'loofa', 'cyber', 'convo',
+                           'kiddy', 'piler', 'rewax', 'panko', 'lacer', 'retag', 'annal', 'glute', 'pinot', 'aioli', 'laddy',
+                           'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy',
+                           'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima', 'ortho', 'odour', 'apnea',
+                           'melty', 'biome', 'niner', 'haram', 'whirr', 'sicky', 'stoma', 'unarm', 'bento', 'kefir', 'ichor',
+                           'untax', 'smarm', 'tryer', 'aimer', 'hoser', 'outro', 'umami', 'repot', 'relit']
+remaining_letters: list[str]  = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+                                 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+required_letters: list[str] = []
 word_count = 1
 
 
-def main():
-    # add argument for setting the scale factor
-    parser = argparse.ArgumentParser(description='Tool to help solve Wordle puzzles')
-    parser.add_argument('-s', '--scale', default=100, type=int, required=False, help='Set the desired scaling percentage')
-    args = parser.parse_args()
+class WordleHelper(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Wordle Helper')
 
-    # add missing words to dictionary
-    for word in added_words:
-        my_dict.add(word)
+        # Create grid for the widget
+        grid_layout: QtWidgets.QGridLayout = QtWidgets.QGridLayout(self)
 
-    window = tk.Tk()
+        # Letter box widgets
+        letters_layout: QtWidgets.QGridLayout = QtWidgets.QGridLayout()
+        self.letters: list[LetterBox] = []
 
-    # set scaling if needed
-    scale = args.scale
-    if scale == 150:
-        window.tk.call('tk', 'scaling', 2.6)
-    elif scale != 100:
-        showwarning(title='Unsupported Scale', message=f'A scale of {scale}% is not currently supported, using 100 instead')
+        for i in range(5):
+            self.letters.append(LetterBox(i))
+            _ = self.letters[i].change_focus.connect(self.focus_letter) # connect to slot for focusing a different letter
+            letters_layout.addWidget(self.letters[i], 0, i + 1)
 
-    window.title('Wordle Helper')
+        # add spacing on either side
+        letter_spacer_left: QtWidgets.QSpacerItem = QtWidgets.QSpacerItem(10, 0)
+        letter_spacer_right: QtWidgets.QSpacerItem = QtWidgets.QSpacerItem(10, 0)
+        letters_layout.addItem(letter_spacer_left, 0, 0)
+        letters_layout.addItem(letter_spacer_right, 0, 6)
 
-    window_width = 700
-    window_height = 420
+        letters_layout.setHorizontalSpacing(10) # add padding between letters
+        letters_layout.setColumnStretch(0, 1) # let spacers consume extra space
+        letters_layout.setColumnStretch(6, 1)
+        grid_layout.addLayout(letters_layout, 0, 0)
 
-    # get screen dimensions
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    # get coordinates for centering window
-    center_x = int(screen_width / 2 - window_width / 2)
-    center_y = int(screen_height / 2 - window_height / 2)
-    # position window in the middle of the screen
-    window.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
-    # don't let the window be resizeable
-    window.resizable(False, False)
+        # Widgets for letters to not include
+        self.exclude_label: QtWidgets.QLabel = QtWidgets.QLabel('Not in the word:')
+        self.exclude_letters: InputBox = InputBox()
 
-    # set columns for window
-    window.columnconfigure(0, weight=4)
-    window.columnconfigure(1, weight=1)
-    window.columnconfigure(2, weight=4)
+        grid_layout.addWidget(self.exclude_label, 1, 0)
+        grid_layout.addWidget(self.exclude_letters, 2, 0)
 
-    # create word input
-    word_frame = ttk.Frame(window)
+        # Widgets for letter to include
+        self.include_label: QtWidgets.QLabel = QtWidgets.QLabel('In the word somewhere:')
+        self.include_letters: InputBox = InputBox()
 
-    l1_text = tk.StringVar()
-    l1_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l1_text)
-    l1_box.bind('<Right>', lambda *args: go_next(l2_box))
-    l1_text.trace('w', lambda *args: character_limit(l1_text, l2_box))
-    l1_box.grid(column=0, row=0)
+        grid_layout.addWidget(self.include_label, 3, 0)
+        grid_layout.addWidget(self.include_letters, 4, 0)
 
-    l2_text = tk.StringVar()
-    l2_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l2_text)
-    l2_box.bind('<BackSpace>', lambda *args: go_back(l1_box))
-    l2_box.bind('<Left>', lambda *args: go_back(l1_box))
-    l2_box.bind('<Right>', lambda *args: go_next(l3_box))
-    l2_text.trace('w', lambda *args: character_limit(l2_text, l3_box))
-    l2_box.grid(column=1, row=0)
+        # Widget for "Find Words" button
+        self.find_button: QtWidgets.QPushButton = QtWidgets.QPushButton('Find Words')
+        _ = self.find_button.clicked.connect(self.find_words)
 
-    l3_text = tk.StringVar()
-    l3_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l3_text)
-    l3_box.bind('<BackSpace>', lambda *args: go_back(l2_box))
-    l3_box.bind('<Left>', lambda *args: go_back(l2_box))
-    l3_box.bind('<Right>', lambda *args: go_next(l4_box))
-    l3_text.trace('w', lambda *args: character_limit(l3_text, l4_box))
-    l3_box.grid(column=2, row=0)
+        grid_layout.addWidget(self.find_button, 5, 0)
 
-    l4_text = tk.StringVar()
-    l4_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l4_text)
-    l4_box.bind('<BackSpace>', lambda *args: go_back(l3_box))
-    l4_box.bind('<Left>', lambda *args: go_back(l3_box))
-    l4_box.bind('<Right>', lambda *args: go_next(l5_box))
-    l4_text.trace('w', lambda *args: character_limit(l4_text, l5_box))
-    l4_box.grid(column=3, row=0)
+        # Add spacer to consume extra vertical space in first column
+        spacer: QtWidgets.QSpacerItem = QtWidgets.QSpacerItem(10, 10, vData=QtWidgets.QSizePolicy.Policy.Ignored)
+        grid_layout.addItem(spacer, 6, 0)
 
-    l5_text = tk.StringVar()
-    l5_box = ttk.Entry(word_frame, width=2, justify='center', textvariable=l5_text)
-    l5_box.bind('<BackSpace>', lambda *args: go_back(l4_box))
-    l5_box.bind('<Left>', lambda *args: go_back(l4_box))
-    l5_text.trace('w', lambda *args: character_limit(l5_text, None))
-    l5_box.grid(column=4, row=0)
+        # Widget for found words
+        self.found_words: QtWidgets.QTextEdit = QtWidgets.QTextEdit()
+        font: QtGui.QFont = QtGui.QFont('Monospace') # Use monospace font for the found words
+        font.setStyleHint(QtGui.QFont.TypeWriter)
+        self.found_words.setFont(font)
+        self.found_words.setReadOnly(True)
 
-    word_frame.grid(row=0, column=0, pady=10)
+        grid_layout.addWidget(self.found_words, 0, 1, 7, 1)
 
-    # create label for letters to remove
-    remove_label = ttk.Label(window, text="Not in the word:")
-    remove_label.grid(row=1, column=0, sticky=tk.W, padx=10)
-
-    # create textbox for letters to remove
-    remove_text = tk.StringVar()
-    remove_box = ttk.Entry(window, textvariable=remove_text)
-    remove_text.trace('w', lambda *args: make_upper(remove_text))
-    remove_box.grid(row=2, column=0, sticky=tk.W, padx=10)
-
-    # create label for required letters
-    required_label = ttk.Label(window, text="In the word somewhere:")
-    required_label.grid(row=3, column=0, sticky=tk.W, padx=10)
-
-    # create textbox for letters to remove
-    required_text = tk.StringVar()
-    required_box = ttk.Entry(window, textvariable=required_text)
-    required_text.trace('w', lambda *args: make_upper(required_text))
-    required_box.grid(row=4, column=0, sticky=tk.W, padx=10)
-
-    # create button for running program
-    run_button = ttk.Button(window, text='Find Words', command=lambda: find_words(l1_text.get(), l2_text.get(), l3_text.get(), l4_text.get(), l5_text.get(), remove_text.get(), required_text.get(), results))
-    run_button.grid(row=5, column=0, pady=10)
-
-    # create text widget for the results
-    results = ScrolledText(window, height=13, width=20)
-    results.grid(row=0, column=2, rowspan=6, padx=10)
-    results['state'] = 'disabled'
-
-    window.mainloop()
+        # Add nice spacing
+        grid_layout.setColumnStretch(0, 1) # First and second column should use same amount of space
+        grid_layout.setColumnStretch(1, 1)
+        grid_layout.setRowStretch(6, 1) # Spacer should claim all unused vertical space (all other rows have 0 stretch)
+        grid_layout.setVerticalSpacing(10) # Add padding between rows
 
 
-def find_words(l1, l2, l3, l4, l5, remove, required, results):
-    global remaining_letters
-    global required_letters
-    global word_count
-
-    # reset remaining letters if needed
-    if len(remaining_letters) != 26:
-        remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-                             'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
-    # reset required letters if needed
-    if len(required_letters) > 0:
-        required_letters = []
-
-    # reset word count
-    word_count = 1
-
-    # clear text box
-    results['state'] = 'normal'
-    results.delete('1.0', 'end')
-    results['state'] = 'disabled'
-
-    # get word from the 5 input letters
-    word = make_word(l1, l2, l3, l4, l5)
-
-    # remove letters that are know to not be in word
-    for letter in remove:
-        if letter in remaining_letters:
-            remaining_letters.remove(letter)
-
-    # get letters that must be in word
-    for letter in required:
-        required_letters.append(letter)
-
-    # get number of missing letters
-    num_missing = word.count('_')
-
-    # generate possible words
-    if num_missing == 1:
-        missing_1(word, results)
-    elif num_missing == 2:
-        missing_2(word, results)
-    elif num_missing == 3:
-        missing_3(word, results)
-    elif num_missing == 4:
-        missing_4(word, results)
-    elif num_missing == 5:
-        missing_5(results)
-
-    # if no words were found
-    if word_count == 1:
-        results['state'] = 'normal'
-        results.insert('1.0', 'No words found')
-        results['state'] = 'disabled'
+    @QtCore.Slot(int)
+    def focus_letter(self, index: int):
+        if index in range(0, len(self.letters)):
+            self.letters[index].setFocus()
+            # Move cursor to the end of the letter if needed
+            if len(self.letters[index].text()) > 0:
+                self.letters[index].setCursorPosition(1)
 
 
-def missing_1(word, results):
-    # for each remaining letter
-    for let in remaining_letters:
-        new_word = ''
-        for old_let in word:
-            if old_let == '_':
-                new_word += let
+    @QtCore.Slot()
+    def find_words(self):
+        global remaining_letters
+        global required_letters
+        global word_count
+
+        # reset remaining letters if needed
+        if len(remaining_letters) != 26:
+            remaining_letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+                                 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+        # reset required letters if needed
+        if len(required_letters) > 0:
+            required_letters = []
+
+        # reset word count
+        word_count = 0
+
+        # clear text box
+        self.found_words.setText('')
+
+        # get word from the 5 input letters
+        word: str = ''
+        for letter in self.letters:
+            if letter.text() == '':
+                word += '_'
             else:
-                new_word += old_let
-        check_and_add(new_word, results)
+                word += letter.text()
+
+        # remove letters that are know to not be in word
+        for letter in self.exclude_letters.text():
+            if letter in remaining_letters:
+                remaining_letters.remove(letter)
+
+        # get letters that must be in word
+        for letter in self.include_letters.text():
+            required_letters.append(letter)
+
+        # get number of missing letters
+        num_missing: int = word.count('_')
+
+        # generate possible words
+        if num_missing == 1:
+            self.missing_1(word)
+        elif num_missing == 2:
+            self.missing_2(word)
+        elif num_missing == 3:
+            self.missing_3(word)
+        elif num_missing == 4:
+            self.missing_4(word)
+        elif num_missing == 5:
+            self.missing_5()
+
+        # if no words were found
+        if word_count == 0:
+            self.found_words.setText('No words found')
 
 
-def missing_2(word, results):
-    # for all possible letter combinations
-    for let_1 in remaining_letters:
-        for let_2 in remaining_letters:
+    def missing_1(self, word: str):
+        # for each remaining letter
+        for let in remaining_letters:
             new_word = ''
-            count = 0
-            # create new word with letters substituted in
-            for let in word:
-                if let == '_' and count == 0:
-                    new_word += let_1
-                    count += 1
-                elif let == '_':
-                    new_word += let_2
-                else:
+            for old_let in word:
+                if old_let == '_':
                     new_word += let
-            check_and_add(new_word, results)
+                else:
+                    new_word += old_let
+            self.check_and_add(new_word)
 
 
-def missing_3(word, results):
-    # for all possible letter combinations
-    for let_1 in remaining_letters:
-        for let_2 in remaining_letters:
-            for let_3 in remaining_letters:
+    def missing_2(self, word: str):
+        # for all possible letter combinations
+        for let_1 in remaining_letters:
+            for let_2 in remaining_letters:
                 new_word = ''
                 count = 0
                 # create new word with letters substituted in
@@ -232,22 +178,18 @@ def missing_3(word, results):
                     if let == '_' and count == 0:
                         new_word += let_1
                         count += 1
-                    elif let == '_' and count == 1:
-                        new_word += let_2
-                        count += 1
                     elif let == '_':
-                        new_word += let_3
+                        new_word += let_2
                     else:
                         new_word += let
-                check_and_add(new_word, results)
+                self.check_and_add(new_word)
 
 
-def missing_4(word, results):
-    # for all possible letter combinations
-    for let_1 in remaining_letters:
-        for let_2 in remaining_letters:
-            for let_3 in remaining_letters:
-                for let_4 in remaining_letters:
+    def missing_3(self, word: str):
+        # for all possible letter combinations
+        for let_1 in remaining_letters:
+            for let_2 in remaining_letters:
+                for let_3 in remaining_letters:
                     new_word = ''
                     count = 0
                     # create new word with letters substituted in
@@ -258,108 +200,161 @@ def missing_4(word, results):
                         elif let == '_' and count == 1:
                             new_word += let_2
                             count += 1
-                        elif let == '_' and count == 2:
-                            new_word += let_3
-                            count += 1
                         elif let == '_':
-                            new_word += let_4
+                            new_word += let_3
                         else:
                             new_word += let
-                    check_and_add(new_word, results)
+                    self.check_and_add(new_word)
 
 
-def missing_5(results):
-    if len(remaining_letters) == 26 and len(required_letters) == 0:
-        results['state'] = 'normal'
-        results.insert('1.0', 'Please enter\nsome info')
-        results['state'] = 'disabled'
-    else:
+    def missing_4(self, word: str):
         # for all possible letter combinations
         for let_1 in remaining_letters:
             for let_2 in remaining_letters:
                 for let_3 in remaining_letters:
                     for let_4 in remaining_letters:
-                        for let_5 in remaining_letters:
-                            new_word = let_1 + let_2 + let_3 + let_4 + let_5
-                            check_and_add(new_word, results)
+                        new_word = ''
+                        count = 0
+                        # create new word with letters substituted in
+                        for let in word:
+                            if let == '_' and count == 0:
+                                new_word += let_1
+                                count += 1
+                            elif let == '_' and count == 1:
+                                new_word += let_2
+                                count += 1
+                            elif let == '_' and count == 2:
+                                new_word += let_3
+                                count += 1
+                            elif let == '_':
+                                new_word += let_4
+                            else:
+                                new_word += let
+                        self.check_and_add(new_word)
 
 
-def check_and_add(word, results):
-    global word_count
-    valid = True
-    # check if word exists
-    if not my_dict.check(word):
-        valid = False
-    # check if word contains required letters
-    for letter in required_letters:
-        if letter not in word:
+    def missing_5(self):
+        global word_count
+        if len(remaining_letters) == 26 and len(required_letters) == 0:
+            self.found_words.setText('Please enter\nsome info')
+            word_count = -1 # If word count is 0, this text will be overwritten at the end of find_words function
+        else:
+            # for all possible letter combinations
+            for let_1 in remaining_letters:
+                for let_2 in remaining_letters:
+                    for let_3 in remaining_letters:
+                        for let_4 in remaining_letters:
+                            for let_5 in remaining_letters:
+                                new_word = let_1 + let_2 + let_3 + let_4 + let_5
+                                self.check_and_add(new_word)
+
+
+    def check_and_add(self, word:str):
+        global word_count
+        valid = True
+        # check if word exists
+        if not my_dict.check(word):
             valid = False
-    # add word to textbox if it is valid
-    if valid:
-        results['state'] = 'normal'
-        results.insert(f'{word_count}.0', f'{word}\n')
-        results['state'] = 'disabled'
-        word_count += 1
+        # check if word contains required letters
+        for letter in required_letters:
+            if letter not in word:
+                valid = False
+        # add word to textbox if it is valid
+        if valid:
+            self.found_words.append(word)
+            word_count += 1
 
 
-def make_word(l1, l2, l3, l4, l5):
-    if l1 == '':
-        l1 = '_'
-    if l2 == '':
-        l2 = '_'
-    if l3 == '':
-        l3 = '_'
-    if l4 == '':
-        l4 = '_'
-    if l5 == '':
-        l5 = '_'
-    return l1 + l2 + l3 + l4 + l5
+class LetterBox(QtWidgets.QLineEdit):
+    # Create singal for changing focus to a different letter
+    change_focus: QtCore.Signal = QtCore.Signal(int)
 
 
-def character_limit(text, next_box):
-    cleared = False
+    def __init__(self, index: int):
+        super().__init__()
+        self.index: int = index
+        self.setFixedWidth(25) # Make these small
+        # Add connection for when text is edited by user
+        _ = self.textEdited.connect(self.modify_text)
 
-    # if user entered more than 1 letter, remove extra letters
-    if len(text.get()) > 0:
-        char = text.get()[-1].upper()
-        if char.isalpha():
-            text.set(char)
-        # clear the text box if space is pressed
-        elif char == ' ':
-            text.set('')
-            cleared = True
-        elif text.get()[0].isalpha():
-            text.set(text.get()[0])
+
+    @QtCore.Slot(str)
+    def modify_text(self, text: str):
+        changed: bool = False
+
+        # if user entered more than 1 letter, remove extra letters
+        if len(text) > 0:
+            char: str = text[-1].upper()
+            if char.isalpha():
+                self.setText(char)
+                changed = True
+            # clear the text box if space is pressed
+            elif char == ' ':
+                self.setText('')
+                changed = True
+            elif text[0].isalpha():
+                self.setText(text[0])
+            else:
+                self.setText('')
+        # Center text
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+
+        # Move to next letter after typing a letter or after pressing space
+        if changed:
+            self.change_focus.emit(self.index + 1)
+
+
+    @override
+    def keyPressEvent(self, arg__1: QtGui.QKeyEvent, /) -> None:
+        # If the left arrow was pressed, go to previous letter
+        if arg__1.key() == QtCore.Qt.Key.Key_Left:
+            self.change_focus.emit(self.index - 1)
+        # If the right arrow was pressed, go to next letter
+        elif arg__1.key() == QtCore.Qt.Key.Key_Right:
+            self.change_focus.emit(self.index + 1)
+        # If backspace was pressed, clear text then go to previous letter
+        elif arg__1.key() == QtCore.Qt.Key.Key_Backspace:
+            self.setText('')
+            self.change_focus.emit(self.index - 1)
+        # Use normal key handler if any other key is pressed
         else:
-            text.set('')
-    # Move to next letter after typing something or after pressing space
-    if next_box and (text.get() != '' or cleared):
-        next_box.focus()
-        next_box.icursor(1)
+            super().keyPressEvent(arg__1)
 
 
-def make_upper(text):
-    letters = text.get().upper()
-
-    # if user entered non-alpha character, or a repeat letter remove it
-    if len(letters) > 0:
-        lastLetter = letters[-1]
-        if not lastLetter.isalpha() or lastLetter in letters[:-1]:
-            text.set(letters[:-1])
-        else:
-            text.set(letters)
+class InputBox(QtWidgets.QLineEdit):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumWidth(10) # Let these get shrunk down
+        # Add connection for when text is edited by user
+        _ = self.textEdited.connect(self.modify_text)
 
 
-def go_back(prev):
-    if prev:
-        prev.focus()
+    @QtCore.Slot(str)
+    def modify_text(self, text: str):
+        text = text.upper()
 
-
-def go_next(next_box):
-    if next_box:
-        next_box.focus()
-        next_box.icursor(1)
+        # if user entered non-alpha character, or a repeat letter remove it
+        if len(text) > 0:
+            lastLetter = text[-1]
+            if not lastLetter.isalpha() or lastLetter in text[:-1]:
+                self.setText(text[:-1])
+            else:
+                self.setText(text)
 
 
 if __name__ == '__main__':
-    main()
+    app = QtWidgets.QApplication([])
+
+    # Match OS light/dark theme
+    qdarktheme.setup_theme('auto')
+
+    # get max allowed dimensions for window (May use in the future, for now unused)
+    screen: QtGui.QScreen = QtGui.QGuiApplication.primaryScreen()
+    max_width: int = screen.availableSize().width()
+    max_heigth: int = screen.availableSize().height()
+
+    widget = WordleHelper()
+    widget.resize(10, 10) # Make window smallest possible size
+    widget.show()
+
+    sys.exit(app.exec())
