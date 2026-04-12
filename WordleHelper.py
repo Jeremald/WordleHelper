@@ -13,7 +13,7 @@ added_words: list[str]  = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled',
                            'unsee', 'paned', 'scape', 'penne', 'slyer', 'ebook', 'merch', 'stymy', 'acidy', 'ochre', 'lordy',
                            'femme', 'homie', 'hedgy', 'rager', 'smore', 'prima', 'ursid', 'anima', 'ortho', 'odour', 'apnea',
                            'melty', 'biome', 'niner', 'haram', 'whirr', 'sicky', 'stoma', 'unarm', 'bento', 'kefir', 'ichor',
-                           'untax', 'smarm', 'tryer', 'aimer', 'hoser', 'outro', 'umami', 'repot', 'relit', 'moult']
+                           'untax', 'smarm', 'tryer', 'aimer', 'hoser', 'outro', 'umami', 'repot', 'relit', 'moult', 'aglet']
 remaining_letters: list[str]  = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
                                  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 required_letters: list[str] = []
