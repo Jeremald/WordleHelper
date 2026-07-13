@@ -2,15 +2,13 @@
 This is a program that can be used to help you find 5 letter words for wordle
 
 ## How to set up:
-1. Make sure you have a version of python 3 installed
-2. Install Qt for Python using the following command:  
-`pip3 install pyside6`
-3. Install pyqtdarktheme-fork using the following command:  
-`pip3 install pyqtdarktheme-fork`
-4. You will need to install the enchant library (See this link for details: https://pyenchant.github.io/pyenchant/install.html)
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Clone this repo
 
 ## How to run:
-`python3 <path to WordleHelper.py>`
+On Linux, you can run the `WordleHelper.sh` script from any location to run this program.
+
+On other operating systems, inside this directory run the command `uv run WordleHelper.py`
 
 ## How to use:
 - The five boxes at the top represent the five letters in the word. Fill in the letters that you know are correct.
