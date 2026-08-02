@@ -1,8 +1,9 @@
-from typing import override
-import enchant
-from PySide6 import QtCore, QtWidgets, QtGui
 import sys
+from typing import override
+
+import enchant
 import qdarktheme
+from PySide6 import QtCore, QtGui, QtWidgets
 
 my_dict = enchant.Dict('en_US')
 added_words: list[str]  = ['aunty', 'leapt', 'aider', 'agora', 'leant', 'abled', 'gayly', 'golem', 'haute', 'fibre', 'pinky',
@@ -25,6 +26,8 @@ class WordleHelper(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Wordle Helper')
+        # The following line will be needed for background blur. Not sure if background blur is possible yet in this version of qt
+        #self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Create grid for the widget
         grid_layout: QtWidgets.QGridLayout = QtWidgets.QGridLayout(self)
@@ -91,7 +94,7 @@ class WordleHelper(QtWidgets.QWidget):
 
     @QtCore.Slot(int)
     def focus_letter(self, index: int):
-        if index in range(0, len(self.letters)):
+        if index in range(len(self.letters)):
             self.letters[index].setFocus()
             # Move cursor to the end of the letter if needed
             if len(self.letters[index].text()) > 0:
@@ -117,6 +120,8 @@ class WordleHelper(QtWidgets.QWidget):
         word_count = 0
 
         # clear text box
+        self.found_words.setText('Searching...')
+        self.found_words.repaint()
         self.found_words.setText('')
 
         # get word from the 5 input letters
@@ -237,7 +242,7 @@ class WordleHelper(QtWidgets.QWidget):
     def missing_5(self):
         global word_count
         if len(remaining_letters) == 26 and len(required_letters) == 0:
-            self.found_words.setText('Please enter\nsome info')
+            self.found_words.setText('Please enter some info')
             word_count = -1 # If word count is 0, this text will be overwritten at the end of find_words function
         else:
             # for all possible letter combinations
@@ -347,7 +352,7 @@ if __name__ == '__main__':
     # add missing words to dictionary
     for word in added_words:
         my_dict.add(word)
-    
+
     app = QtWidgets.QApplication([])
 
     # Match OS light/dark theme
